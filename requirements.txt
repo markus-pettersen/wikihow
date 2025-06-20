@@ -3,5 +3,4 @@ numpy
 pickle
 networkx
 pyvis.network
-streamlit.components.v1 import html
 itertools
