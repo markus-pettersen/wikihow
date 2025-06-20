@@ -54,7 +54,7 @@ title_id_map = dict(zip(filtered_df["Title"], filtered_df["Article_Id"]))
 select_article = st.sidebar.selectbox("Select article", filtered_df["Title"])
 
 st.sidebar.header("Navigation")
-page = st.sidebar.radio("Choose section", ["Article Information", "View Subgraph"])
+page = st.sidebar.radio("Choose section", ["Article Information", "View Subgraph", "About Project"])
 
 selected_node = title_id_map[select_article]
 selected_row = filtered_df[filtered_df["Article_Id"] == selected_node].iloc[0]
@@ -146,4 +146,20 @@ elif page == "View Subgraph":
 		st.metric(value=avg_shortest_path, label="Average shortest path (subgraph)")
 			
 elif page == "About Project":
-	pass
+	st.subheader("About the Project")
+	st.markdown("""This project explores a large collection of featured [wikiHow](https://www.wikihow.com/Main-Page) articles using \
+		**Natural Language Processing** (NLP) and network analysis techniques.""")
+	st.markdown("""
+		The main goals are to:
+		- Cluster articles.
+		- Build a topic map that connects similar articles.
+		- Analyse article roles within a network.
+		- Visualise connected subgraphs of related articles.
+		""")
+	st.markdown("""
+		To explore the data, select an article from the sidebar to the left. Key metric and full articles can be viewed from the **Article Information** page,\
+		and local subgraphs can be examined from the **View Subgraph** page.
+
+		[View the full project on GitHub for more information](https://github.com/markus-pettersen/wikihow)
+
+		""")
