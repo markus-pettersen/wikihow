@@ -1,8 +1,7 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import pickle
-import networkx as nx
-from pyvis.network import Network
-from streamlit.components.v1 import html
-from itertools import combinations
+pandas
+numpy
+pickle
+networkx
+pyvis.network
+streamlit.components.v1 import html
+itertools
