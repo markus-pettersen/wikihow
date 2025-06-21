@@ -5,7 +5,7 @@ import pickle
 import networkx as nx
 from streamlit.components.v1 import html
 from itertools import combinations
-from graph_utils import create_subgraph, create_pyvis_graph, get_subgraph_metrics, prune_nodes, prune_edges
+from graph_utils import *
 
 @st.cache_data
 def load_data():
@@ -16,7 +16,15 @@ def load_data():
 
 df, G = load_data()
 
+
 df["Popularity"] = pd.qcut(df["Views"], 4, labels=["Low", "Medium", "High", "Very High"])
+
+# match boundaries in notebook
+deg_threshold = df["Degree"].quantile(0.75)
+df["Degree_Cat"] = df["Degree"].apply(lambda x: "High" if x >= deg_threshold else "Low")
+
+bwn_threshold = df["Betweenness"].quantile(0.75)
+df["Between_Cat"] = df["Betweenness"].apply(lambda x: "High" if x >= bwn_threshold else "Low")
 
 filtered_df = df.copy()
 
@@ -114,8 +122,9 @@ if page == "Article Information":
 		st.markdown(f'**Popularity**: {selected_row["Popularity"]}')
 	with art_col2:
 		st.markdown(f'**Neighbours**: {selected_row["Neighbours"]}')
-		st.markdown(f'**Normalized degree centrality**: {round(selected_row["Degree_norm"], 2)}')
-		st.markdown(f'**Normalized betweenness centrality**: {round(selected_row["Betweenness_norm"], 2)}')
+		st.markdown(f'**Degree centrality**: {selected_row["Degree_Cat"]}')
+		st.markdown(f'**Betweenness centrality**: {selected_row["Between_Cat"]}')
+	
 	st.write(selected_row["Intro"])
 
 	reveal_button = st.toggle(label="Show full article")
@@ -142,7 +151,7 @@ elif page == "View Subgraph":
 	with graph_col2:
 		st.subheader("Centrality (target node)")
 		st.metric(value=round(local_node_degree, 2), label="Local degree centrality")
-		st.metric(value=round(local_node_betweenness, 2), label="Local betweenness centrality")  
+		st.metric(value=round(local_node_betweenness, 3), label="Local betweenness centrality")  
 		st.metric(value=avg_shortest_path, label="Average shortest path (subgraph)")
 			
 elif page == "About Project":
@@ -163,3 +172,5 @@ elif page == "About Project":
 		[View the full project on GitHub for more information](https://github.com/markus-pettersen/wikihow)
 
 		""")
+
+
