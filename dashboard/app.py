@@ -4,7 +4,6 @@ import numpy as np
 import pickle
 import networkx as nx
 from streamlit.components.v1 import html
-from itertools import combinations
 from graph_utils import *
 
 @st.cache_data
@@ -15,9 +14,6 @@ def load_data():
 	return df, network_graph
 
 df, G = load_data()
-
-
-df["Popularity"] = pd.qcut(df["Views"], 4, labels=["Low", "Medium", "High", "Very High"])
 
 # match boundaries in notebook
 deg_threshold = df["Degree"].quantile(0.75)
@@ -36,7 +32,6 @@ nodes_removed = False
 # filter
 st.sidebar.header("Filters")
 
-
 topic_options = ["All"] + sorted(list(df["Topic"].unique()))
 
 popularity_order = ["Low", "Medium", "High", "Very High"]
@@ -47,13 +42,18 @@ popularity_options = ["All"] + popularity_filtered
 selected_topic = st.sidebar.selectbox("Select Topic", topic_options)
 selected_popularity = st.sidebar.selectbox("Select Popularity", popularity_options)
 
+cat_options = ["All"] + list(df["Category"].unique())
+selected_category = st.sidebar.selectbox("Select Category", cat_options)
+
 
 if selected_topic != "All":
 	filtered_df = filtered_df[filtered_df["Topic"] == selected_topic]
 
-
 if selected_popularity != "All":
 	filtered_df = filtered_df[filtered_df["Popularity"] == selected_popularity]
+
+if selected_category != "All":
+	filtered_df = filtered_df[filtered_df["Category"] == selected_category]
 
 st.sidebar.write(f"{len(filtered_df)} articles found.")
 
@@ -64,9 +64,13 @@ select_article = st.sidebar.selectbox("Select article", filtered_df["Title"])
 st.sidebar.header("Navigation")
 page = st.sidebar.radio("Choose section", ["Article Information", "View Subgraph", "About Project"])
 
-selected_node = title_id_map[select_article]
-selected_row = filtered_df[filtered_df["Article_Id"] == selected_node].iloc[0]
-
+try:
+	selected_node = title_id_map[select_article]
+	selected_row = filtered_df[filtered_df["Article_Id"] == selected_node].iloc[0]
+# catch the exception when no article meet filter criteria
+except KeyError:
+	st.error("No articles found. Please reselected filters.")
+	st.stop()
 
 subgraph = create_subgraph(G, selected_node)
 subgraph_nodes, subgraph_edges, subgraph_density = get_subgraph_metrics(subgraph)
@@ -80,7 +84,6 @@ elif subgraph_edges > 50:
 	subgraph = prune_nodes(subgraph, selected_node)
 	nodes_removed = True
 
-
 for node in subgraph.nodes:
 	if node == selected_node:	 
 		subgraph.nodes[node]["color"] = "#FFD700"
@@ -92,24 +95,13 @@ subgraph_degree = nx.degree_centrality(subgraph)
 local_node_degree = subgraph_degree[selected_node]
 subgraph_betweenness = nx.betweenness_centrality(subgraph)
 local_node_betweenness = subgraph_betweenness[selected_node]
+avg_shortest_path = calculate_shortest_paths(subgraph)
 
-# shortest path
-paths = []
-for a1, a2 in combinations(subgraph.nodes, 2):
-
-    try:
-        path_len = nx.shortest_path_length(subgraph, source=a1, target=a2)
-        paths.append(path_len)
-    except nx.NetworkXNoPath:
-        continue  # skip pairs not connected
-
-avg_shortest_path = np.mean(paths).round(2)
 
 nodes_in_graph = subgraph.nodes()
 
 # ==== Main === 
 st.header("Article Network Dashboard")
-
 
 if page == "Article Information":
 
@@ -137,7 +129,7 @@ elif page == "View Subgraph":
 		st.write("For technical reasons, edges below a similarity threshold have been removed. Isolated nodes are part of the larger subgraph, \
 			and included for completeness")
 	elif nodes_removed:
-		st.write("For technical reasons, redundant nodes have been removed.")
+		st.write("For technical reasons, redundant nodes have been removed in display. Metrics are still accurate for entire subgraph.")
 	html_content = create_pyvis_graph(subgraph, "graph.html")
 	html(html_content, height=400, width=600)
 
@@ -152,7 +144,7 @@ elif page == "View Subgraph":
 		st.subheader("Centrality (target node)")
 		st.metric(value=round(local_node_degree, 2), label="Local degree centrality")
 		st.metric(value=round(local_node_betweenness, 3), label="Local betweenness centrality")  
-		st.metric(value=avg_shortest_path, label="Average shortest path (subgraph)")
+		st.metric(value=avg_shortest_path, label="Average shortest path (whole subgraph)")
 			
 elif page == "About Project":
 	st.subheader("About the Project")
@@ -172,5 +164,3 @@ elif page == "About Project":
 		[View the full project on GitHub for more information](https://github.com/markus-pettersen/wikihow)
 
 		""")
-
-

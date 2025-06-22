@@ -1,4 +1,6 @@
 import networkx as nx
+from itertools import combinations
+import numpy as np
 from pyvis.network import Network
 
 
@@ -31,6 +33,17 @@ def prune_edges(sub_graph, selected_node, threshold=0.8):
 
 	return pruned_subgraph
 
+def calculate_shortest_paths(sub_graph):
+	paths = []
+	for node1, node2 in combinations(sub_graph.nodes, 2):
+		try:
+			path_len = nx.shortest_path_length(sub_graph, source=node1, target=node2)
+			paths.append(path_len)
+		except nx.NetworkXNoPath:
+			continue
+
+	avg_shortest_path = np.mean(paths).round(2)
+	return avg_shortest_path
 
 def create_pyvis_graph(sub_graph, filename):
 
@@ -38,7 +51,7 @@ def create_pyvis_graph(sub_graph, filename):
 
 	for node, data in sub_graph.nodes(data=True):
 		hover_text = (
-			f"{data['title']}\nTopic: {data['topic']}\nCategory: {data['category']}"
+			f"{data['title']}\nTopic: {data['topic']}\nCategory: {data['category']}\nPopularity: {data['popularity']}"
 			)
 		sub_graph.nodes[node]['title'] = hover_text
 
