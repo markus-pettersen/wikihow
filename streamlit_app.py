@@ -62,7 +62,7 @@ title_id_map = dict(zip(filtered_df["Title"], filtered_df["Article_Id"]))
 select_article = st.sidebar.selectbox("Select article", filtered_df["Title"])
 
 st.sidebar.header("Navigation")
-page = st.sidebar.radio("Choose section", ["Article Information", "View Subgraph", "About Project"])
+page = st.sidebar.radio("Choose section", ["About Project", "Article Information", "View Subgraph"])
 
 try:
 	selected_node = title_id_map[select_article]
@@ -155,10 +155,10 @@ elif page == "About Project":
 		- Cluster articles.
 		- Build a topic map that connects similar articles.
 		- Analyse article roles within a network.
-		- Visualise connected subgraphs of related articles.
+		- Visualize connected subgraphs of related articles.
 		""")
 	st.markdown("""
-		To explore the data, select an article from the sidebar to the left. Key metric and full articles can be viewed from the **Article Information** page,\
+		To explore the data, select an article from the **sidebar to the left**. Key metric and full articles can be viewed from the **Article Information** page,\
 		and local subgraphs can be examined from the **View Subgraph** page.
 
 		[View the full project on GitHub for more information](https://github.com/markus-pettersen/wikihow)
