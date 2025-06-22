@@ -1,7 +1,6 @@
 streamlit
 pandas
 numpy
-pickle
 networkx
 pyvis.network
 itertools
