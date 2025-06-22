@@ -2,5 +2,4 @@ streamlit
 pandas
 numpy
 networkx
-pyvis.network
-itertools
+pyvis
