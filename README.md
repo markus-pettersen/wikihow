@@ -32,6 +32,7 @@ This project combines **clustering**, **topic modelling** and **network analysis
 ## Limitations & Future work
 
 - No synonyms detection (from spaCy for example).
+- Pyvis networks with many nodes or high density can act unexpectedly. To prevent this, some subgraphs are pruned to display fewer nodes or edges.  
 - In the future, I will identify the prototypical article from each topic/cluster.
 - Future improved dashboard features.
 - **Agglutinative clustering** to create a topic hierarchy for the articles.
