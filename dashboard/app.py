@@ -8,8 +8,8 @@ from graph_utils import *
 
 @st.cache_data
 def load_data():
-	df = pd.read_csv("../data/final/completed_articles.csv")
-	with open("../data/models/full_graph.gpickle", "rb") as f:
+	df = pd.read_csv("/data/final/completed_articles.csv")
+	with open("/data/models/full_graph.gpickle", "rb") as f:
 		network_graph = pickle.load(f)
 	return df, network_graph
 
