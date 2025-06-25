@@ -42,8 +42,11 @@ def calculate_shortest_paths(sub_graph):
 		except nx.NetworkXNoPath:
 			continue
 
-	avg_shortest_path = np.mean(paths).round(2)
-	return avg_shortest_path
+	if paths:
+		avg_shortest_path = np.mean(paths).round(2)
+		return avg_shortest_path
+	else:
+		return 0
 
 def create_pyvis_graph(sub_graph, filename):
 
